@@ -57,7 +57,6 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
     uint256 public totalMinted;
     uint256 public thisRoundMinted;
     bool public isPublic;
-    bool public isSBT;
 
     bytes32 public merkleRoot;
 
@@ -85,7 +84,6 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
         thisRoundMinted = 0;
         isPublic = false;
         merkleRoot = _merkleRoot;
-        isSBT = false;
     }
     
     // Utilities
@@ -127,7 +125,6 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
             thisRoundMinted + _quantity <= thisRoundSupply,
             "This round is sold out!"
         );    
-
         require(
             totalMinted + _quantity <= MAX_SUPPLY,
             "ALL SOLD!"
@@ -188,12 +185,6 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
     function burn(uint tokenId) external whenNotPaused {
         _burn(tokenId, true);
     }
-
-    function burnBatchPublic(uint[] calldata tokenIds) external whenNotPaused {
-        for (uint256 index = 0; index < tokenIds.length; index++) {
-            _burn(tokenIds[index], true);
-        }
-    }
     
     function burnBatch(uint[] calldata tokenIds) external onlyOwner {
         for (uint256 index = 0; index < tokenIds.length; index++) {
@@ -201,21 +192,14 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
         }
     }
 
-    // Sounbound token implementation
-    function setIsSBT(bool _isSBT) external onlyOwner {
-        isSBT = _isSBT;
-    }
-
+    // Soulbound token implementation
     function _beforeTokenTransfers(
         address from,
         address to,
         uint256 startTokenId,
         uint256 quantity
     ) internal virtual override {
-        if(isSBT) {
-            require(from == address(0) || to == address(0), "Soulbound token is non-transferrable!");
-        }
+        require(from == address(0) || to == address(0), "Soulbound token is non-transferrable!");
         super._beforeTokenTransfers(from, to, startTokenId, quantity);
     }
-
 }

@@ -35,7 +35,6 @@ contract Genesis is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgra
     uint256 public constant whitelistPrice = 0.00001 ether;
     uint256 public constant publicPrice = 0.000002 ether;
     bytes32 public merkleRoot;
-    address public BURN_CONTRACT_PROXY;
     
 
     mapping(address => uint256) mintedAccounts;
@@ -48,8 +47,7 @@ contract Genesis is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgra
         uint256 _mintEndAt,        
         bytes32 _merkleRoot,
         uint256 _FFEndAt,
-        uint256 _WLEndAt,
-        address _burnProxy
+        uint256 _WLEndAt
     ) initializerERC721A initializer public {
         __ERC721A_init('Genesis', 'GENZ');
         __Ownable_init();
@@ -63,7 +61,6 @@ contract Genesis is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgra
         FFEndAt = _FFEndAt;
         WLEndAt = _WLEndAt;
         totalMinted = 0;
-        BURN_CONTRACT_PROXY = _burnProxy;
     }
     
     // Utilities
@@ -77,10 +74,6 @@ contract Genesis is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgra
     
     function _merkleTreeVerify(bytes32 _leaf, bytes32[] memory _proof) internal view returns(bool) {
         return MerkleProof.verify(_proof, merkleRoot, _leaf);
-    }
-
-    function setBurnProxy(address _BURN_CONTRACT_PROXY) external onlyOwner {
-        BURN_CONTRACT_PROXY = _BURN_CONTRACT_PROXY;
     }
     
     // Mint Setup

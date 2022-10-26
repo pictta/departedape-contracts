@@ -138,12 +138,6 @@ contract Genesis is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgra
         mintedAccounts[msg.sender] += _quantity;        
     }
 
-    function batchMint(address[] calldata _to, uint256[] calldata _quantities) external payable onlyOwner {
-        for (uint256 index = 0; index < _to.length; index++) {
-            _safeMint(_to[index], _quantities[index]);
-        }
-    }
-
     // Post Mint
     function _baseURI() internal view virtual override returns (string memory) {
         return baseURI;

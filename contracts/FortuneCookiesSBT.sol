@@ -181,8 +181,9 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
     }
     
     function burnBatch(uint[] calldata tokenIds) external onlyOwner {
-        for (uint256 index = 0; index < tokenIds.length; index++) {
+        for (uint256 index = 0; index < tokenIds.length;) {
             _burn(tokenIds[index]);
+            unchecked { index++; }
         }
     }
 

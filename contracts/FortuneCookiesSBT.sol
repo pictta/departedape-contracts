@@ -60,7 +60,8 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
 
     bytes32 public merkleRoot;
 
-    mapping(address => uint256) mintedAccounts;
+    mapping(address => uint256) mintedAccountsWL;
+    mapping(address => uint256) mintedAccountsPublic;
 
     function initialize(
         uint256 _MAX_PER_ADDRESS,
@@ -116,10 +117,6 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
         require(
             (thisRoundStart <= block.timestamp && thisRoundEnd > block.timestamp), 
             "Mint is not active."
-        );
-        require(
-            mintedAccounts[msg.sender] + _quantity <= MAX_PER_ADDRESS,
-            "Sorry, you have minted all your quota."
         ); 
         require(
             thisRoundMinted + _quantity <= thisRoundSupply,
@@ -130,14 +127,27 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
             "ALL SOLD!"
         );  
         if (!isPublic) {
+            require(
+                mintedAccountsWL[msg.sender] + _quantity <= MAX_PER_ADDRESS,
+                "Sorry, you have minted all your quota for Whitelist Round."
+            ); 
             require(_merkleTreeVerify(_merkleTreeLeaf(msg.sender), proof),
                 "Sorry, you are not whitelisted for this round. Come back later!"
             );
+            _safeMint(msg.sender, _quantity);
+            totalMinted += _quantity;
+            thisRoundMinted += _quantity;
+            mintedAccountsWL[msg.sender] += _quantity;
+        } else {
+            require(
+                mintedAccountsPublic[msg.sender] + _quantity <= MAX_PER_ADDRESS,
+                "Sorry, you have minted all your quota for Public Round."
+            );            
+            _safeMint(msg.sender, _quantity);
+            totalMinted += _quantity;
+            thisRoundMinted += _quantity;
+            mintedAccountsPublic[msg.sender] += _quantity;
         }
-        _safeMint(msg.sender, _quantity);
-        totalMinted += _quantity;
-        thisRoundMinted += _quantity;
-        mintedAccounts[msg.sender] += _quantity;
     }
 
     // Post Mint

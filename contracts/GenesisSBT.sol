@@ -106,7 +106,7 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
                     "earlyBirdSupply round is sold out!"
                 );
                 require(
-                    msg.value >= earlyBirdPrice * _quantity,
+                    msg.value == earlyBirdPrice * _quantity,
                     "Insufficient payment."
                 );                
             } else {
@@ -116,7 +116,7 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
                     "White list round is sold out!"
                 );
                 require(
-                    msg.value >= whitelistPrice * _quantity,
+                    msg.value == whitelistPrice * _quantity,
                     "Insufficient payment."
                 );
             }
@@ -124,7 +124,7 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
         } else {
             // Public tier
             require(
-                msg.value >= publicPrice * _quantity,
+                msg.value == publicPrice * _quantity,
                 "Insufficient payment."
             );
             _safeMint(msg.sender, _quantity);

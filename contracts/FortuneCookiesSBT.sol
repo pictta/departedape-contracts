@@ -49,8 +49,7 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
     string public baseURI; 
     string public tokenURISuffix;
     uint256 public constant MAX_SUPPLY = 4000;    
-    uint256 public MAX_PER_ADDRESS;
-
+    uint256 public MAX_PER_ADDRESS_PER_ROUND;
     uint256 public thisRoundStart;
     uint256 public thisRoundEnd;
     uint256 public thisRoundSupply;
@@ -64,7 +63,7 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
     mapping(address => uint256) mintedAccountsPublic;
 
     function initialize(
-        uint256 _MAX_PER_ADDRESS,
+        uint256 _MAX_PER_ADDRESS_PER_ROUND,
         string memory _coverBaseURI,
         string memory _tokenURISuffix,
         uint256 _thisRoundStart,
@@ -77,7 +76,7 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
 
         baseURI = _coverBaseURI;
         tokenURISuffix = _tokenURISuffix;
-        MAX_PER_ADDRESS = _MAX_PER_ADDRESS;
+        MAX_PER_ADDRESS_PER_ROUND = _MAX_PER_ADDRESS_PER_ROUND;
         thisRoundStart = _thisRoundStart;
         thisRoundEnd = _thisRoundEnd;
         thisRoundSupply = _thisRoundSupply;
@@ -128,7 +127,7 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
         );  
         if (!isPublic) {
             require(
-                mintedAccountsWL[msg.sender] + _quantity <= MAX_PER_ADDRESS,
+                mintedAccountsWL[msg.sender] + _quantity <= MAX_PER_ADDRESS_PER_ROUND,
                 "Sorry, you have minted all your quota for Whitelist Round."
             ); 
             require(_merkleTreeVerify(_merkleTreeLeaf(msg.sender), proof),
@@ -140,7 +139,7 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
             mintedAccountsWL[msg.sender] += _quantity;
         } else {
             require(
-                mintedAccountsPublic[msg.sender] + _quantity <= MAX_PER_ADDRESS,
+                mintedAccountsPublic[msg.sender] + _quantity <= MAX_PER_ADDRESS_PER_ROUND,
                 "Sorry, you have minted all your quota for Public Round."
             );            
             _safeMint(msg.sender, _quantity);
@@ -186,10 +185,6 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
     }
 
     // Burn function
-    function burn(uint tokenId) external whenNotPaused {
-        _burn(tokenId, true);
-    }
-    
     function burnBatch(uint[] calldata tokenIds) external onlyOwner {
         for (uint256 index = 0; index < tokenIds.length;) {
             _burn(tokenIds[index]);

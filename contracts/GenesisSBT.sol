@@ -14,15 +14,10 @@ interface IERC20 {
     function transfer(address _to, uint256 _amount) external returns (bool);
 }
 
-interface IFortuneCookies {
-    function burnBatchPublic(uint[] calldata tokenIds) external;
-}
-
-contract Genesis is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable {
+contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable {
     string public baseURI; 
     string public tokenURISuffix;
     uint256 public constant MAX_SUPPLY = 10000;    
-    uint256 public constant QUOTA_PER_BURN = 2;    
     uint256 public MAX_PER_ADDRESS;
     uint256 public constant earlyBirdSupply = 2000;
     uint256 public constant WLSupply = 3000;
@@ -35,6 +30,7 @@ contract Genesis is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgra
     uint256 public constant whitelistPrice = 0.00001 ether;
     uint256 public constant publicPrice = 0.000002 ether;
     bytes32 public merkleRoot;
+    address public constant VAULT = 0x0000000000000000000000000000000000000000; 
     
 
     mapping(address => uint256) mintedAccounts;
@@ -49,7 +45,7 @@ contract Genesis is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgra
         uint256 _FFEndAt,
         uint256 _WLEndAt
     ) initializerERC721A initializer public {
-        __ERC721A_init('Genesis', 'GENZ');
+        __ERC721A_init('GenesisSBT', 'GSBT');
         __Ownable_init();
 
         baseURI = _coverBaseURI;
@@ -155,8 +151,8 @@ contract Genesis is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgra
     }
 
     // Fund Withdraw
-    function withdrawETH(address _to) external onlyOwner {
-        payable(_to).transfer(address(this).balance);
+    function withdrawETH() external onlyOwner {
+        payable(VAULT).transfer(address(this).balance);
     }
 
     function withdrawERC20(address _to, address _tokenContract, uint256 _amount) external onlyOwner {

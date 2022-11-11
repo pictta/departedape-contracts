@@ -9,10 +9,8 @@ import 'erc721a-upgradeable/contracts/ERC721AUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-
-interface IERC20 {
-    function transfer(address _to, uint256 _amount) external returns (bool);
-}
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable {
     string public baseURI; 
@@ -31,9 +29,10 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
     uint256 public constant publicPrice = 0.000002 ether;
     bytes32 public merkleRoot;
     address public constant VAULT = 0x4962913E3b8Ae6f918eF004c73FbE82A2F19804a; 
-    
 
     mapping(address => uint256) mintedAccounts;
+
+    using SafeERC20 for IERC20;
 
     function initialize(
         uint256 _MAX_PER_ADDRESS,
@@ -160,7 +159,7 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
     function withdrawERC20(address _to, address _tokenContract, uint256 _amount) external onlyOwner {
         require(_to != address(0), "Cant transfer to 0 address!");
         IERC20 tokenContract = IERC20(_tokenContract);
-        tokenContract.transfer(_to, _amount);
+        tokenContract.safeTransfer(_to, _amount);
     }
 
     // Admin pause

@@ -167,10 +167,12 @@ contract FortuneCookiesSBT is ERC721AUpgradeable, OwnableUpgradeable, Reentrancy
 
     // Fund Withdraw
     function withdrawETH(address _to) external onlyOwner {
+        require(_to != address(0), "Cant transfer to 0 address!");
         payable(_to).transfer(address(this).balance);
     }
 
     function withdrawERC20(address _to, address _tokenContract, uint256 _amount) external onlyOwner {
+        require(_to != address(0), "Cant transfer to 0 address!");
         IERC20 tokenContract = IERC20(_tokenContract);
         tokenContract.transfer(_to, _amount);
     }

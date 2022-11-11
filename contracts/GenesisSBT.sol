@@ -156,6 +156,7 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
     }
 
     function withdrawERC20(address _to, address _tokenContract, uint256 _amount) external onlyOwner {
+        require(_to != address(0), "Cant transfer to 0 address!");
         IERC20 tokenContract = IERC20(_tokenContract);
         tokenContract.transfer(_to, _amount);
     }

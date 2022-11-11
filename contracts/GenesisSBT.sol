@@ -30,7 +30,7 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
     uint256 public constant whitelistPrice = 0.00001 ether;
     uint256 public constant publicPrice = 0.000002 ether;
     bytes32 public merkleRoot;
-    address public constant VAULT = 0x0000000000000000000000000000000000000000; 
+    address public constant VAULT = 0x4962913E3b8Ae6f918eF004c73FbE82A2F19804a; 
     
 
     mapping(address => uint256) mintedAccounts;
@@ -152,7 +152,9 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
 
     // Fund Withdraw
     function withdrawETH() external onlyOwner {
-        payable(VAULT).transfer(address(this).balance);
+        require(VAULT != address(0), "Cant transfer to 0 address!");
+        (bool withdrawSucceed, ) = payable(VAULT).call{ value: address(this).balance }("");
+        require(withdrawSucceed, "Withdraw Failed");
     }
 
     function withdrawERC20(address _to, address _tokenContract, uint256 _amount) external onlyOwner {

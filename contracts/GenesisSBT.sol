@@ -9,10 +9,18 @@ import 'erc721a-upgradeable/contracts/ERC721AUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {RevokableDefaultOperatorFiltererUpgradeable} from "./opensea/upgradeable/RevokableDefaultOperatorFiltererUpgradeable.sol";
+import {RevokableOperatorFiltererUpgradeable} from "./opensea/upgradeable/RevokableOperatorFiltererUpgradeable.sol";
 
-contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable {
+contract GenesisSBT is 
+    ERC721AUpgradeable, 
+    ReentrancyGuardUpgradeable, 
+    PausableUpgradeable,
+    RevokableDefaultOperatorFiltererUpgradeable,
+    OwnableUpgradeable
+{
     string public baseURI; 
     string public tokenURISuffix;
     uint256 public constant MAX_SUPPLY = 10000;    
@@ -32,7 +40,7 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
 
     mapping(address => uint256) mintedAccounts;
 
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     function initialize(
         uint256 _MAX_PER_ADDRESS,
@@ -46,6 +54,7 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
     ) initializerERC721A initializer public {
         __ERC721A_init('GenesisSBT', 'GSBT');
         __Ownable_init();
+        __RevokableDefaultOperatorFilterer_init();
 
         baseURI = _coverBaseURI;
         tokenURISuffix = _tokenURISuffix;
@@ -158,7 +167,7 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
 
     function withdrawERC20(address _to, address _tokenContract, uint256 _amount) external onlyOwner {
         require(_to != address(0), "Cant transfer to 0 address!");
-        IERC20 tokenContract = IERC20(_tokenContract);
+        IERC20Upgradeable tokenContract = IERC20Upgradeable(_tokenContract);
         tokenContract.safeTransfer(_to, _amount);
     }
 
@@ -169,5 +178,34 @@ contract GenesisSBT is ERC721AUpgradeable, OwnableUpgradeable, ReentrancyGuardUp
 
     function unpause() external onlyOwner {
         _unpause();
+    }
+
+    // Opensea Operator filter registry
+    function setApprovalForAll(address operator, bool approved) public override onlyAllowedOperatorApproval(operator) {
+        super.setApprovalForAll(operator, approved);
+    }
+
+    function approve(address operator, uint256 tokenId) public override onlyAllowedOperatorApproval(operator) {
+        super.approve(operator, tokenId);
+    }
+
+    function transferFrom(address from, address to, uint256 tokenId) public override onlyAllowedOperator(from) {
+        super.transferFrom(from, to, tokenId);
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId) public override onlyAllowedOperator(from) {
+        super.safeTransferFrom(from, to, tokenId);
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data)
+        public
+        override
+        onlyAllowedOperator(from)
+    {
+        super.safeTransferFrom(from, to, tokenId, data);
+    }
+
+    function owner() public view virtual override (OwnableUpgradeable, RevokableOperatorFiltererUpgradeable) returns (address) {
+        return OwnableUpgradeable.owner();
     }
 }

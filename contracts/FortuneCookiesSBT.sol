@@ -52,42 +52,41 @@ contract FortuneCookiesSBT is
 {
     string public baseURI; 
     string public tokenURISuffix;
-    uint256 public constant MAX_SUPPLY = 4000;    
-    uint256 public MAX_PER_ADDRESS_PER_ROUND;
-    uint256 public thisRoundStart;
-    uint256 public thisRoundEnd;
-    uint256 public thisRoundSupply;
+    uint256 public constant MAX_SUPPLY = 6000; 
+    uint256 public constant whitelistSupply = 3000;
+    uint256 public MAX_PER_ADDRESS_WL;
+    uint256 public MAX_PER_ADDRESS_PUB;
+    uint256 public mintStart;
+    uint256 public mintEnd;
+    uint256 public whitelistEnd;
     uint256 public totalMinted;
-    uint256 public thisRoundMinted;
-    bool public isPublic;
-
     bytes32 public merkleRoot;
 
     mapping(address => uint256) mintedAccountsWL;
     mapping(address => uint256) mintedAccountsPublic;
 
     function initialize(
-        uint256 _MAX_PER_ADDRESS_PER_ROUND,
+        uint256 _MAX_PER_ADDRESS_WL,
+        uint256 _MAX_PER_ADDRESS_PUB,
         string memory _coverBaseURI,
         string memory _tokenURISuffix,
-        uint256 _thisRoundStart,
-        uint256 _thisRoundEnd,
-        uint256 _thisRoundSupply,
+        uint256 _mintStart,
+        uint256 _mintEnd,
+        uint256 _whitelistEnd,
         bytes32 _merkleRoot        
     ) initializerERC721A initializer public {
-        __ERC721A_init('FortuneCookiesSBT', 'FCSBT');
+        __ERC721A_init('FortuneCookiesSBTV2', 'FCSV2');
         __Ownable_init();
         __RevokableDefaultOperatorFilterer_init();
 
         baseURI = _coverBaseURI;
         tokenURISuffix = _tokenURISuffix;
-        MAX_PER_ADDRESS_PER_ROUND = _MAX_PER_ADDRESS_PER_ROUND;
-        thisRoundStart = _thisRoundStart;
-        thisRoundEnd = _thisRoundEnd;
-        thisRoundSupply = _thisRoundSupply;
+        MAX_PER_ADDRESS_WL = _MAX_PER_ADDRESS_WL;
+        MAX_PER_ADDRESS_PUB = _MAX_PER_ADDRESS_PUB;
+        mintStart = _mintStart;
+        mintEnd = _mintEnd;
+        whitelistEnd = _whitelistEnd;
         totalMinted = 0;
-        thisRoundMinted = 0;
-        isPublic = false;
         merkleRoot = _merkleRoot;
     }
     
@@ -105,34 +104,31 @@ contract FortuneCookiesSBT is
     }
 
     // Mint Setup
-    function setFreeMintInfo(uint256 _thisRoundMinted, uint256 _thisRoundStart, uint256 _thisRoundEnd, uint256 _thisRoundSupply) public onlyOwner {        
-        thisRoundMinted = _thisRoundMinted;
-        thisRoundStart = _thisRoundStart;  // block.timestamp to start mint
-        thisRoundEnd = _thisRoundEnd; // block.timestamp to end mint
-        thisRoundSupply = _thisRoundSupply;  // total tokens available for this round
-    }
-
-    function setPublicMint(bool _bool) public onlyOwner {
-       isPublic = _bool;
+    function setFreeMintInfo(uint256 _mintStart, uint256 _mintEnd, uint256 _whitelistEnd, uint256 _MAX_PER_ADDRESS_WL, uint256 _MAX_PER_ADDRESS_PUB) public onlyOwner {                
+        mintStart = _mintStart;  // block.timestamp to start mint
+        mintEnd = _mintEnd; // block.timestamp to end mint
+        whitelistEnd = _whitelistEnd; // block.timestamp to end mint
+        MAX_PER_ADDRESS_WL = _MAX_PER_ADDRESS_WL;
+        MAX_PER_ADDRESS_PUB = _MAX_PER_ADDRESS_PUB;
     }
 
     // Mint
     function freeMint(uint256 _quantity, bytes32[] calldata proof) external nonReentrant whenNotPaused {
         require(
-            (thisRoundStart <= block.timestamp && thisRoundEnd > block.timestamp), 
+            (mintStart <= block.timestamp && mintEnd > block.timestamp), 
             "Mint is not active."
-        ); 
-        require(
-            thisRoundMinted + _quantity <= thisRoundSupply,
-            "This round is sold out!"
-        );    
+        );           
         require(
             totalMinted + _quantity <= MAX_SUPPLY,
             "ALL SOLD!"
         );  
-        if (!isPublic) {
+        if (block.timestamp <= whitelistEnd) {
             require(
-                mintedAccountsWL[msg.sender] + _quantity <= MAX_PER_ADDRESS_PER_ROUND,
+                totalMinted + _quantity <= whitelistSupply,
+                "Whitelist round is sold out!"
+            );  
+            require(
+                mintedAccountsWL[msg.sender] + _quantity <= MAX_PER_ADDRESS_WL,
                 "Sorry, you have minted all your quota for Whitelist Round."
             ); 
             require(_merkleTreeVerify(_merkleTreeLeaf(msg.sender), proof),
@@ -140,16 +136,14 @@ contract FortuneCookiesSBT is
             );
             _safeMint(msg.sender, _quantity);
             totalMinted += _quantity;
-            thisRoundMinted += _quantity;
             mintedAccountsWL[msg.sender] += _quantity;
         } else {
             require(
-                mintedAccountsPublic[msg.sender] + _quantity <= MAX_PER_ADDRESS_PER_ROUND,
+                mintedAccountsPublic[msg.sender] + _quantity <= MAX_PER_ADDRESS_PUB,
                 "Sorry, you have minted all your quota for Public Round."
             );            
             _safeMint(msg.sender, _quantity);
             totalMinted += _quantity;
-            thisRoundMinted += _quantity;
             mintedAccountsPublic[msg.sender] += _quantity;
         }
     }
@@ -184,14 +178,6 @@ contract FortuneCookiesSBT is
 
     function unpause() external onlyOwner {
         _unpause();
-    }
-
-    // Burn function
-    function burnBatch(uint[] calldata tokenIds) external onlyOwner {
-        for (uint256 index = 0; index < tokenIds.length;) {
-            _burn(tokenIds[index]);
-            unchecked { index++; }
-        }
     }
 
     // Soulbound token implementation

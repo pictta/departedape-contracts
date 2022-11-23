@@ -6,6 +6,7 @@ pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import 'erc721a-upgradeable/contracts/ERC721AUpgradeable.sol';
+import 'erc721a-upgradeable/contracts/IERC721AUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
@@ -24,122 +25,105 @@ contract GenesisSBT is
     string public baseURI; 
     string public tokenURISuffix;
     uint256 public constant MAX_SUPPLY = 10000;    
-    uint256 public MAX_PER_ADDRESS;
-    uint256 public constant earlyBirdSupply = 2000;
-    uint256 public constant WLSupply = 3000;
-    uint256 public mintStartAt;
-    uint256 public mintEndAt;
-    uint256 public FFEndAt;
-    uint256 public WLEndAt;
-    uint256 public totalMinted;
-    uint256 public constant earlyBirdPrice = 0.00001 ether;
-    uint256 public constant whitelistPrice = 0.00001 ether;
-    uint256 public constant publicPrice = 0.000002 ether;
-    bytes32 public merkleRoot;
-    address public constant VAULT = 0x4962913E3b8Ae6f918eF004c73FbE82A2F19804a; 
+    uint256 public MAX_PER_FC_WL;
+    uint256 public MAX_PER_ADDRESS_PUB;
 
-    mapping(address => uint256) mintedAccounts;
+    uint256 public mintStart;
+    uint256 public mintEnd;
+    uint256 public whitelistEnd;
+    uint256 public totalMinted;
+
+    uint256 public constant whitelistPrice = 0.000001 ether;
+    uint256 public constant publicPrice = 0.000002 ether;
+
+    address public constant WL_NFT_PROXY = 0x82AF3E65666Ca9fb0cd7C7A08b534373a797e416;
+    address public constant VAULT = 0x1BC7A57b2da9368d8b25a5C94408e1ad2e20B1A9; 
+
+    mapping(address => uint256) mintedAccountsWL;
+    mapping(address => uint256) mintedAccountsPUB;
 
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
-    function initialize(
-        uint256 _MAX_PER_ADDRESS,
+    function initialize(        
         string memory _coverBaseURI,
         string memory _tokenURISuffix,
-        uint256 _mintStartAt,
-        uint256 _mintEndAt,        
-        bytes32 _merkleRoot,
-        uint256 _FFEndAt,
-        uint256 _WLEndAt
+        uint256 _MAX_PER_FC_WL,
+        uint256 _MAX_PER_ADDRESS_PUB,
+        uint256 _mintStart,
+        uint256 _mintEnd,
+        uint256 _whitelistEnd
     ) initializerERC721A initializer public {
-        __ERC721A_init('GenesisSBT', 'GSBT');
+        __ERC721A_init('GenesisSBTV2', 'GSBTV2');
         __Ownable_init();
         __RevokableDefaultOperatorFilterer_init();
 
         baseURI = _coverBaseURI;
         tokenURISuffix = _tokenURISuffix;
-        MAX_PER_ADDRESS = _MAX_PER_ADDRESS;
-        mintStartAt = _mintStartAt;
-        mintEndAt = _mintEndAt;
-        merkleRoot = _merkleRoot;        
-        FFEndAt = _FFEndAt;
-        WLEndAt = _WLEndAt;
+
+        MAX_PER_FC_WL = _MAX_PER_FC_WL;
+        MAX_PER_ADDRESS_PUB = _MAX_PER_ADDRESS_PUB;
+
+        mintStart = _mintStart;
+        mintEnd = _mintEnd;
+        whitelistEnd = _whitelistEnd;
         totalMinted = 0;
     }
-    
-    // Utilities
-    function setNewMerkleRoot(bytes32 _newRoot) external onlyOwner {
-        merkleRoot = _newRoot;
+    // balanceOf for owned FC
+    function getWhitelistQuota(address _user) public view returns(uint256)  {
+        IERC721AUpgradeable fcContract = IERC721AUpgradeable(WL_NFT_PROXY);
+        return fcContract.balanceOf(_user) * MAX_PER_FC_WL;
     }
 
-    function _merkleTreeLeaf(address _address) internal pure returns (bytes32) {
-        return keccak256((abi.encodePacked(_address)));
-    }
-    
-    function _merkleTreeVerify(bytes32 _leaf, bytes32[] memory _proof) internal view returns(bool) {
-        return MerkleProof.verify(_proof, merkleRoot, _leaf);
-    }
-    
     // Mint Setup
-    function setMintInfo(uint256 _mintStartAt, uint256 _mintEndAt, uint256 _FFEndAt, uint256 _WLEndAt) public onlyOwner {                
-        mintStartAt = _mintStartAt;  // block.timestamp to start mint
-        mintEndAt = _mintEndAt; // block.timestamp to end mint
-        FFEndAt = _FFEndAt;
-        WLEndAt = _WLEndAt;
+    function setMintInfo(uint256 _mintStart, uint256 _mintEnd, uint256 _whitelistEnd, uint256 _MAX_PER_FC_WL, uint256 _MAX_PER_ADDRESS_PUB) public onlyOwner {                
+        mintStart = _mintStart;  // block.timestamp to start mint
+        mintEnd = _mintEnd; // block.timestamp to end mint
+        whitelistEnd = _whitelistEnd;
+        MAX_PER_FC_WL = _MAX_PER_FC_WL;
+        MAX_PER_ADDRESS_PUB = _MAX_PER_ADDRESS_PUB;
     }
 
     // Mint
-    function mint(uint256 _quantity, bytes32[] calldata proof) external nonReentrant payable whenNotPaused {
+    function mint(uint256 _quantity) external nonReentrant payable whenNotPaused {
         require(
-            (mintStartAt <= block.timestamp && mintEndAt > block.timestamp), 
+            (mintStart <= block.timestamp && mintEnd > block.timestamp), 
             "Mint is not active."
-        );
-        require(
-            mintedAccounts[msg.sender] + _quantity <= MAX_PER_ADDRESS,
-            "Sorry, you have minted all your quota."
-        ); 
+        );        
         require(
             totalMinted + _quantity <= MAX_SUPPLY,
-            "ALL SOLD!"
+            "SOLD OUT!"
         );  
 
-        if(block.timestamp < WLEndAt) {
-            require(_merkleTreeVerify(_merkleTreeLeaf(msg.sender), proof),
-                "Sorry, you are not whitelisted for this round. Come back later!"
+        if(block.timestamp <= whitelistEnd) {
+            // WL tier
+            require(
+                mintedAccountsWL[msg.sender] + _quantity <= getWhitelistQuota(msg.sender),
+                "Sorry, you have minted all your quota."
+            ); 
+            require(
+                msg.value == whitelistPrice * _quantity,
+                "Insufficient payment."
             );
-            // Frens & Fam tier
-            if(block.timestamp < FFEndAt) {
-                require(
-                    totalMinted + _quantity <= earlyBirdSupply,
-                    "earlyBirdSupply round is sold out!"
-                );
-                require(
-                    msg.value == earlyBirdPrice * _quantity,
-                    "Insufficient payment."
-                );                
-            } else {
-            // Fortune Cookies tier  
-                require(
-                    totalMinted + _quantity <= earlyBirdSupply + WLSupply,
-                    "White list round is sold out!"
-                );
-                require(
-                    msg.value == whitelistPrice * _quantity,
-                    "Insufficient payment."
-                );
-            }
-            _safeMint(msg.sender, _quantity);                              
+
+            _safeMint(msg.sender, _quantity);   
+            totalMinted += _quantity;         
+            mintedAccountsWL[msg.sender] += _quantity;   
+
         } else {
             // Public tier
+            require(
+                mintedAccountsPUB[msg.sender] + _quantity <= MAX_PER_ADDRESS_PUB,
+                "Sorry, you have minted all your quota in public round."
+            );
             require(
                 msg.value == publicPrice * _quantity,
                 "Insufficient payment."
             );
-            _safeMint(msg.sender, _quantity);
-        }
-
-        totalMinted += _quantity;        
-        mintedAccounts[msg.sender] += _quantity;        
+            
+            _safeMint(msg.sender, _quantity);   
+            totalMinted += _quantity;         
+            mintedAccountsPUB[msg.sender] += _quantity;  
+        }  
     }
 
     // Post Mint

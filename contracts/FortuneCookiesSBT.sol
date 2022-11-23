@@ -52,7 +52,7 @@ contract FortuneCookiesSBT is
 {
     string public baseURI; 
     string public tokenURISuffix;
-    uint256 public constant MAX_SUPPLY = 6000; 
+    uint256 public constant MAX_SUPPLY = 5000; 
     uint256 public constant whitelistSupply = 3000;
     uint256 public MAX_PER_ADDRESS_WL;
     uint256 public MAX_PER_ADDRESS_PUB;

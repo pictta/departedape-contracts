@@ -52,8 +52,7 @@ contract FortuneCookiesSBT is
 {
     string public baseURI; 
     string public tokenURISuffix;
-    uint256 public constant MAX_SUPPLY = 5000; 
-    uint256 public constant whitelistSupply = 3000;
+    uint256 public MAX_SUPPLY;
     uint256 public MAX_PER_ADDRESS_WL;
     uint256 public MAX_PER_ADDRESS_PUB;
     uint256 public mintStart;
@@ -73,21 +72,24 @@ contract FortuneCookiesSBT is
         uint256 _mintStart,
         uint256 _mintEnd,
         uint256 _whitelistEnd,
-        bytes32 _merkleRoot        
+        bytes32 _merkleRoot,
+        uint256 _MAX_SUPPLY     
     ) initializerERC721A initializer public {
-        __ERC721A_init('FortuneCookiesSBTV2', 'FCSV2');
+        __ERC721A_init('FCUAT', 'FUAT');
         __Ownable_init();
         __RevokableDefaultOperatorFilterer_init();
 
-        baseURI = _coverBaseURI;
-        tokenURISuffix = _tokenURISuffix;
         MAX_PER_ADDRESS_WL = _MAX_PER_ADDRESS_WL;
         MAX_PER_ADDRESS_PUB = _MAX_PER_ADDRESS_PUB;
+        baseURI = _coverBaseURI;
+        tokenURISuffix = _tokenURISuffix;        
         mintStart = _mintStart;
         mintEnd = _mintEnd;
         whitelistEnd = _whitelistEnd;
         totalMinted = 0;
         merkleRoot = _merkleRoot;
+
+        MAX_SUPPLY = _MAX_SUPPLY;
     }
     
     // Utilities
@@ -104,15 +106,22 @@ contract FortuneCookiesSBT is
     }
 
     // Mint Setup
-    function setFreeMintInfo(uint256 _mintStart, uint256 _mintEnd, uint256 _whitelistEnd, uint256 _MAX_PER_ADDRESS_WL, uint256 _MAX_PER_ADDRESS_PUB) public onlyOwner {                
-        mintStart = _mintStart;  // block.timestamp to start mint
-        mintEnd = _mintEnd; // block.timestamp to end mint
-        whitelistEnd = _whitelistEnd; // block.timestamp to end mint
+    function setFreeMintInfo(uint256 _mintStart, uint256 _mintEnd, uint256 _whitelistEnd, uint256 _MAX_PER_ADDRESS_WL, uint256 _MAX_PER_ADDRESS_PUB, uint256 _MAX_SUPPLY) public onlyOwner {                
+        mintStart = _mintStart;
+        mintEnd = _mintEnd;
+        whitelistEnd = _whitelistEnd;
         MAX_PER_ADDRESS_WL = _MAX_PER_ADDRESS_WL;
         MAX_PER_ADDRESS_PUB = _MAX_PER_ADDRESS_PUB;
+        MAX_SUPPLY = _MAX_SUPPLY;
     }
 
     // Mint
+    function _mintBatch(address _to, uint256 _quantity) virtual internal {
+        require(_quantity > 0, "Quantity must be greater than 0");
+        _safeMint(_to, _quantity);   
+        totalMinted += _quantity;
+    }
+
     function freeMint(uint256 _quantity, bytes32[] calldata proof) external nonReentrant whenNotPaused {
         require(
             (mintStart <= block.timestamp && mintEnd > block.timestamp), 
@@ -124,7 +133,7 @@ contract FortuneCookiesSBT is
         );  
         if (block.timestamp <= whitelistEnd) {
             require(
-                totalMinted + _quantity <= whitelistSupply,
+                totalMinted + _quantity <= MAX_SUPPLY,
                 "Whitelist round is sold out!"
             );  
             require(
@@ -134,16 +143,14 @@ contract FortuneCookiesSBT is
             require(_merkleTreeVerify(_merkleTreeLeaf(msg.sender), proof),
                 "Sorry, you are not whitelisted for this round. Come back later!"
             );
-            _safeMint(msg.sender, _quantity);
-            totalMinted += _quantity;
+            _mintBatch(msg.sender, _quantity);
             mintedAccountsWL[msg.sender] += _quantity;
         } else {
             require(
                 mintedAccountsPublic[msg.sender] + _quantity <= MAX_PER_ADDRESS_PUB,
                 "Sorry, you have minted all your quota for Public Round."
             );            
-            _safeMint(msg.sender, _quantity);
-            totalMinted += _quantity;
+            _mintBatch(msg.sender, _quantity);
             mintedAccountsPublic[msg.sender] += _quantity;
         }
     }

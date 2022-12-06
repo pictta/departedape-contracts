@@ -43,7 +43,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import {RevokableDefaultOperatorFiltererUpgradeable} from "./opensea/upgradeable/RevokableDefaultOperatorFiltererUpgradeable.sol";
 import {RevokableOperatorFiltererUpgradeable} from "./opensea/upgradeable/RevokableOperatorFiltererUpgradeable.sol";
 
-contract FortuneCookiesSBT is 
+contract DepartedApesFortuneCookies is 
     ERC721AUpgradeable,     
     ReentrancyGuardUpgradeable, 
     PausableUpgradeable,
@@ -75,7 +75,7 @@ contract FortuneCookiesSBT is
         bytes32 _merkleRoot,
         uint256 _MAX_SUPPLY     
     ) initializerERC721A initializer public {
-        __ERC721A_init('FCUAT', 'FUAT');
+        __ERC721A_init('DepartedApesFortuneCookies', 'DAFC');
         __Ownable_init();
         __RevokableDefaultOperatorFilterer_init();
 

@@ -133,10 +133,6 @@ contract DepartedApesFortuneCookies is
         );  
         if (block.timestamp <= whitelistEnd) {
             require(
-                totalMinted + _quantity <= MAX_SUPPLY,
-                "Whitelist round is sold out!"
-            );  
-            require(
                 mintedAccountsWL[msg.sender] + _quantity <= MAX_PER_ADDRESS_WL,
                 "Sorry, you have minted all your quota for Whitelist Round."
             ); 

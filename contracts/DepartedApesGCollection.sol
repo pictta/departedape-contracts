@@ -15,7 +15,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import {RevokableDefaultOperatorFiltererUpgradeable} from "./opensea/upgradeable/RevokableDefaultOperatorFiltererUpgradeable.sol";
 import {RevokableOperatorFiltererUpgradeable} from "./opensea/upgradeable/RevokableOperatorFiltererUpgradeable.sol";
 
-contract GenesisSBT is 
+contract DepartedApesGCollection is 
     ERC721AUpgradeable, 
     ReentrancyGuardUpgradeable, 
     PausableUpgradeable,
@@ -35,8 +35,7 @@ contract GenesisSBT is
     uint256 public waitlistEnd;
     uint256 public totalMinted;
 
-    address public constant FC_NFT_PROXY = 0x82AF3E65666Ca9fb0cd7C7A08b534373a797e416;
-    address public constant VAULT = 0x1BC7A57b2da9368d8b25a5C94408e1ad2e20B1A9; 
+    address public constant FC_NFT_PROXY = 0x25e83E339B5414909CDE81F7BF0A5401B21201F9;
 
     bytes32 public merkleRoot;
 
@@ -73,7 +72,7 @@ contract GenesisSBT is
         MintPrices calldata _mintPrices
 
     ) initializerERC721A initializer public {
-        __ERC721A_init('GenesisSBT', 'GSBTV3');
+        __ERC721A_init('DepartedApesGCollection', 'DAGC');
         __Ownable_init();
         __RevokableDefaultOperatorFilterer_init();
 
@@ -238,9 +237,9 @@ contract GenesisSBT is
     }
 
     // Fund Withdraw
-    function withdrawETH() external onlyOwner {
-        require(VAULT != address(0), "Cant transfer to 0 address!");
-        (bool withdrawSucceed, ) = payable(VAULT).call{ value: address(this).balance }("");
+    function withdrawETH(address _to) external onlyOwner {
+        require(_to != address(0), "Cant transfer to 0 address!");
+        (bool withdrawSucceed, ) = payable(_to).call{ value: address(this).balance }("");
         require(withdrawSucceed, "Withdraw Failed");
     }
 

@@ -1,6 +1,43 @@
 // SPDX-License-Identifier: MIT
-/*
-ascii art   
+/*                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                    ...::^^~!77?JJJJJJ?~                  
+                                                                                                                                                                                                 ....:^^~!7! .JY55PPPGGGGBBBBGRID6GRID6G5                 
+                                                                                                                                                                               ...::^~!~ !JJY55PPPGGGBBBBBB? JGRID6GRID6P7!!?GRID6GRID6GY                 
+                                                                                                                                                                :^~~!7?JJY55PPPGGGGBBBB?^GRID6GRID6GJ77!~~^ .GRID6GRID6G~   .GRID6GRID6G^                 
+                                                                                                                                         ...::^~~!7??JYYYYYY?: YBBBBGRID6GRID6GGGY?7!!~ JGRID6GRID67        7GRID6GRID6P    7GRID6GRID65                  
+                                                                                                                      ...:.        JY55PPPGGGGBBBGRID6GRID6GGP.7?7!~?GRID6GRID6GJ      .GRID6GRID6G.        PGRID6GRID67    PGRID6GRID6!                  
+                                                                                                            ~7?JYY55PPPGGGP       ~GRID6GRID6G?!~?GRID6GRID6GY      !GRID6GRID6G:      ?GRID6GRID6P^^~!7?: ~GRID6GRID6G.   ~GRID6GRID6P                   
+                                                                                ....:^^~!!7?JJYY55YY?~     ?GRID6GRID6GRID6.      5GRID6GRID6J   ^GRID6GRID6G^      PGRID6GRID65       PGRID6GRID6GBBBBBB: 5GRID6GRID6J    5GRID6GRID6?                   
+                                                              ...::^~!!7?J.^55PPPGRID6GBBBGRID6GRID6GB7   ?GRID6GRID6GRID6G^     :GRID6GRID6G:   YGRID6GRID6Y      ~GRID6GRID6G~      !GRID6GRID6P?7!~^^. :GRID6GRID6G:   :GRID6GRID6G.                   
+                                           ........    ^Y55PPPGRID6BBBBBBP.5GRID6GRID657!!5GRID6GRID6G!  ?GRID6GGPPGRID6GGG!     JGRID6GRID65   !GRID6GGGG5!       5GRID6GRID6P       5GRID6GRID6~        JGRID6GRID65    JGRID6GRID6Y                    
+                           ::^^~!7??JY55PPPGRID6GGGP5: PGRID6GRID6Y!~~^:: ^GRID6GRID6G:   7GRID6GRID6P  ?GRID6GGP~PGRID6GGG?    .GRID6GRID6GP55PGRID6GGPJ^        :GRID6GRID6G7      ^GRID6GRID6P        .GRID6GRID6G~   .GRID6GRID6G:                    
+                          YGRID6GGGGYGRID6YGRID6GRID67^GRID6GRID6P        YGRID6GRID6Y    PGRID6GRID6? ?GRID6GGG: GRID6GGGGY    7GRID6GRID6GRID6GRID6GGGPPJ       JGRID6GRID6G.      YGRID6GRID67        7GRID6GRID6P:.:~5GRID6GGGGP~                     
+                         .GRID6GRID6G!   !GRID6GRID6G:YGRID6GRID6!       :GRID6GRID6G^   ^GRID6GRID6G:?GRID6GGG! .GRID6GGGG5    PGRID6GRID6Y^^^JGRID6GRID6G.     .GRID6GRID6GJ      .GRID6GRID6G^...:^^  PGRID6GRID6GGGGBGRID6GP5J~.                      
+                         ?GRID6GRID6P    ?GRID6GRID6Y:GRID6GRID6G?~!7?J? ?GRID6GRID6P   :5GRID6GRID67?GRID6GGG7  .GRID6GGGGP.  ~GRID6GRID6G.   ?GRID6GRID6Y      7GRID6GRID6G:      ?GRID6GRID6GRID6GBP ~BGRID6GPP55YYJ??7!~^:.                           
+                        .PGRID6GRID6!   .PGRID6GRID6^?GRID6GRID6GBBBBGB7.PGRID6GRID6PYY5GRID6GRID6J^?GRID6GGGP~^~?GRID6GRID6:  5GRID6GRID6J   .PGRID6GRID6^      PGRID6GRID65      .GRID6GGGPPP55YYJ??: :~^::...                                          
+                        !GRID6GRID6P.   !GRID6GRID65:PGRID6GRID6?~~^::. !GRID6GRID6GRID6PP55YJ7~:. ?GRID6GRID6BBBGRID6GRID6G^ ^GRID6GRID6G:   !GRID6GRID65      !BGRID6GPPP5^      .!~^^::...                                                             
+                        5GRID6GRID6?    PGRID6GRID6!!GRID6GRID65        PGRID6GRID6?:...          ?GRID6GGGPJ?7!~7GRID6GRID6! JGRID6GRID65    PGRID6GPPPP~      :~^^:....                                                                                 
+                       ^GRID6GRID6G:   ^GRID6GRID6P:5GRID6GRID6~       ^GRID6GRID6P              ?GRID6GGGG^     .GRID6GGGGBJ.GGGGPPP55YY:    ~^^::...                                                                                               
+                       YGRID6GRID6Y    YGRID6GRID6?^GRID6GRID65        YGRID6GRID67             JGRID6GGGG!      .555YJ?7!!~: :.....                                                                                         
+                      .GRID6GRID6G^   :GRID6GRID6G:JGRID6GRID6Y.::^~!::GRID6GRID6G.            7PYYJ?77!~:              .:^~!77?JYY555YYJ?~                                                          
+                      ?GRID6GRID65    JGRID6GRID6?:GRID6GRID6GGGGBBBB^?GGGPPP55YY!             .....::^^~!7?JJ5:   .!J5PGRID6BBGRID6GRID6GG5                                                          
+                     .PGRID6GRID6G2022GRID6GGGG5~ JBGGGGPPP55YY??7!~^ :::.........:::::.    ~5PPPPGRID6BBBBGGGP  ^5GRID6GGGGY^:^PGRID6GRID6P                                                         
+                     !GRID6GRID6GGBGGGPP5YJ7~:.   :^::...      :^^~~!7??JY55PPPGRID6GGGGP~  PGRID6GRID6?^^::..  ?GRID6GRID65    PGRID6GRID67                                                  
+                     YP5YYJ?77!~^^::... ....::^~!77??Y^       ~GRID6GRID6GGPPGRID6GRID6GG5 ~GRID6GRID65        .GRID6GRID6G^   :YJ??7!!~^^:                                                           
+                                       !PGRID6GRID6GGGJ       5GRID6GRID6Y.  ^GRID6GRID6G7 5GRID6GRID6!        ?GRID6GRID6P.  ...::::..                                                              
+                                      7GRID6GRID6GRID65      :GRID6GRID6G:   ~GRID6GRID6G.:GRID6GRID6GJ7?JY5J  PGRID6GRID6GPLFGMGRID6GGP5:                                                       
+                                     7GRID6GRID6GRID6GP      JGRID6GRID65    5GRID6GRID6J JGRID6GRID6GGBGGGG!  !PGRID6GGGPPP55GRID6GRID6GY                                                          
+                                    7GRID6GGPYGRID6GGGG.    .GRID6GRID6G^   ^GRID6GRID6G..GRID6GRID6G7^::...      ........   :GRID6GRID6G~                                                                   
+                                   7GRID6GGG:!GRID6GGGG:    7GRID6GRID6G^:^7PGRID6GGGGP: 7GRID6GRID6Y         .::^~~!77?J.   7GRID6GRID6P                                                                         
+                                  7GRID6GGG! !GRID6GGGG~    PGRID6GRID6GGGBBGRID6GP5J~   PGRID6GRID6^        YGRID6GRID65   .PGRID6GRID6^                                                                                 
+                                 7GRID6GGG?  !GRID6GGGG7   ~GRID6GRID6GYJJ?7!!~^:.      ~GRID6GRID65        .GRID6GRID6G5^^!5GRID6GGGP7.                                                                                                                  
+                                7GRID6GGG5   ?GRID6GGGGY   5GRID6GRID67                 5GRID6GRID6Y:^~!7?^  JGRID6GRID6GBBBGGGP5Y?~:                                                                                                                     
+                               7GRCODEBYSOLDEVWITHLOVEG5  ^GRID6GRID6G.                :GRID6GRID6GGBBBBBB:   .^!7?????7!!~^::.                                                                                                                           
+                              7GRID6GRID6GPPPPGRID6GGGGP  JGRID6GRID6?                 JGGGPPP55YYJ?77!~^:                                                                                                                                                
+                             7GRID6GGGG~..   7GRID6GRID6..GRID6GRID6G:                 ::...                                                                                                                                                              
+                            7GRID6GGGG!      7BGRID6GPPP:~5YJ?77!~~^.                                                                                                                                                                                     
+                           ?BGRID6PPP7       .~^::...                                                                                                                                                                                                     
+                          .~^::...                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 */
 pragma solidity ^0.8.14;
 
@@ -10,8 +47,6 @@ import 'erc721a-upgradeable/contracts/IERC721AUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import {RevokableDefaultOperatorFiltererUpgradeable} from "./opensea/upgradeable/RevokableDefaultOperatorFiltererUpgradeable.sol";
 import {RevokableOperatorFiltererUpgradeable} from "./opensea/upgradeable/RevokableOperatorFiltererUpgradeable.sol";
 
@@ -25,14 +60,17 @@ contract DepartedApesGCollection is
     string public baseURI; 
     string public tokenURISuffix;
     uint256 public constant MAX_SUPPLY = 10000;    
-    uint256 public MAX_PER_FC_WL;
-    uint256 public MAX_PER_ADDRESS_WL;
-    uint256 public MAX_PER_ADDRESS_PUB;
+    uint256 public constant MAX_PER_FC = 2;
+    uint256 public constant MAX_PER_ADDRESS_WL = 2;
+    uint256 public constant MAX_PER_ADDRESS_PUB = 2;
 
-    uint256 public mintStart;
-    uint256 public mintEnd;
-    uint256 public fortuneCookiesEnd;
-    uint256 public waitlistEnd;
+    uint256 public constant mintStart = 1671109200;
+    uint256 public constant fortuneCookiesEnd = 1671152400;
+    uint256 public constant waitlistEnd = 1671174000;
+    uint256 public constant mintEnd = 1671195600;
+    uint256 public constant fortuneCookiesPrice = 0.0001 ether;
+    uint256 public constant waitlistPrice = 0.0002 ether;
+    uint256 public constant publicPrice = 0.0003 ether;
     uint256 public totalMinted;
 
     address public constant FC_NFT_PROXY = 0x25e83E339B5414909CDE81F7BF0A5401B21201F9;
@@ -47,30 +85,11 @@ contract DepartedApesGCollection is
         uint256 maxQuota;
         uint256 currentPrice;
     }
-    
-    struct MintPrices {
-        uint256 fortuneCookiesPrice;
-        uint256 waitlistPrice;
-        uint256 publicPrice;
-    }
-
-    MintPrices public mintPrices;
-
-    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     function initialize(        
         string memory _coverBaseURI,
         string memory _tokenURISuffix,
-        uint256 _MAX_PER_FC_WL,
-        uint256 _MAX_PER_ADDRESS_WL,
-        uint256 _MAX_PER_ADDRESS_PUB,
-        uint256 _mintStart,
-        uint256 _mintEnd,
-        uint256 _fortuneCookiesEnd,
-        uint256 _waitlistEnd,
-        bytes32 _merkleRoot,
-        MintPrices calldata _mintPrices
-
+        bytes32 _merkleRoot
     ) initializerERC721A initializer public {
         __ERC721A_init('DepartedApesGCollection', 'DAGC');
         __Ownable_init();
@@ -78,19 +97,8 @@ contract DepartedApesGCollection is
 
         baseURI = _coverBaseURI;
         tokenURISuffix = _tokenURISuffix;
-
-        MAX_PER_FC_WL = _MAX_PER_FC_WL;
-        MAX_PER_ADDRESS_WL = _MAX_PER_ADDRESS_WL;
-        MAX_PER_ADDRESS_PUB = _MAX_PER_ADDRESS_PUB;
-
-        mintStart = _mintStart;
-        mintEnd = _mintEnd;
-        fortuneCookiesEnd = _fortuneCookiesEnd;
-        waitlistEnd = _waitlistEnd;
         totalMinted = 0;
         merkleRoot = _merkleRoot;
-
-        mintPrices = _mintPrices;
     }
 
     // utility
@@ -106,50 +114,30 @@ contract DepartedApesGCollection is
         return MerkleProof.verify(_proof, merkleRoot, _leaf);
     }
 
-    // balanceOf for owned FC
-    function getWhitelistQuota(address _user) public view returns(uint256)  {
+    function _isFortuneCookiesHolder(address _user) internal view returns(bool) {
         IERC721AUpgradeable fcContract = IERC721AUpgradeable(FC_NFT_PROXY);
-        return fcContract.balanceOf(_user) * MAX_PER_FC_WL;
-    }
-
-    // Mint Setup
-    function setMintInfo(uint256 _mintStart, uint256 _mintEnd, uint256 _fortuneCookiesEnd, uint256 _waitlistEnd, uint256 _MAX_PER_FC_WL, uint256 _MAX_PER_ADDRESS_PUB, uint256 _MAX_PER_ADDRESS_WL) public onlyOwner {                
-        mintStart = _mintStart;  // block.timestamp to start mint
-        mintEnd = _mintEnd; // block.timestamp to end mint
-        fortuneCookiesEnd = _fortuneCookiesEnd;
-        waitlistEnd = _waitlistEnd;
-        MAX_PER_FC_WL = _MAX_PER_FC_WL;
-        MAX_PER_ADDRESS_PUB = _MAX_PER_ADDRESS_PUB;
-        MAX_PER_ADDRESS_WL = _MAX_PER_ADDRESS_WL;
-    }
-
-    function setMintPrices(uint256 _fortuneCookiesPrice, uint256 _waitlistPrice, uint256 _publicPrice) public onlyOwner {
-        mintPrices = MintPrices(
-            _fortuneCookiesPrice,
-            _waitlistPrice,
-            _publicPrice
-        );
+        return fcContract.balanceOf(_user) == 1;
     }
 
     // Mint status query
     function getMintStatus(address _user) public view returns (MintQuota memory) {
         if (block.timestamp <= fortuneCookiesEnd) {
             return MintQuota(
-                getWhitelistQuota(_user) - mintedAccountsB4Pub[_user],
-                getWhitelistQuota(_user),
-                mintPrices.fortuneCookiesPrice
+                MAX_PER_FC - mintedAccountsB4Pub[_user],
+                MAX_PER_FC,
+                fortuneCookiesPrice
             );
         } else if (block.timestamp <= waitlistEnd) {
             return MintQuota(
                 MAX_PER_ADDRESS_WL - mintedAccountsB4Pub[_user],
                 MAX_PER_ADDRESS_WL,
-                mintPrices.waitlistPrice
+                waitlistPrice
             );
         } else {
             return MintQuota(
                 MAX_PER_ADDRESS_PUB - mintedAccountsPUB[_user],
                 MAX_PER_ADDRESS_PUB,
-                mintPrices.publicPrice
+                publicPrice
             );
         }
     }
@@ -180,11 +168,15 @@ contract DepartedApesGCollection is
         if(block.timestamp <= fortuneCookiesEnd) {
             // fortune cookies round
             require(
-                mintedAccountsB4Pub[msg.sender] + _quantity <= getWhitelistQuota(msg.sender),
+                _isFortuneCookiesHolder(msg.sender),
+                "Sorry, you don't own any fortune cookies, please come back later."
+            );
+            require(
+                mintedAccountsB4Pub[msg.sender] + _quantity <= MAX_PER_FC,
                 "Sorry, you have minted all your quota in non-public round."
             ); 
             require(
-                msg.value == mintPrices.fortuneCookiesPrice * _quantity,
+                msg.value == fortuneCookiesPrice * _quantity,
                 "Insufficient payment."
             );
             _mintBatch(msg.sender, _quantity);      
@@ -200,7 +192,7 @@ contract DepartedApesGCollection is
                 "Sorry, you have minted all your quota in non-public round."
             ); 
             require(
-                msg.value == mintPrices.waitlistPrice * _quantity,
+                msg.value == waitlistPrice * _quantity,
                 "Insufficient payment."
             );
             _mintBatch(msg.sender, _quantity);      
@@ -212,7 +204,7 @@ contract DepartedApesGCollection is
                 "Sorry, you have minted all your quota in public round."
             );
             require(
-                msg.value == mintPrices.publicPrice * _quantity,
+                msg.value == publicPrice * _quantity,
                 "Insufficient payment."
             );            
             _mintBatch(msg.sender, _quantity);       
@@ -241,12 +233,6 @@ contract DepartedApesGCollection is
         require(_to != address(0), "Cant transfer to 0 address!");
         (bool withdrawSucceed, ) = payable(_to).call{ value: address(this).balance }("");
         require(withdrawSucceed, "Withdraw Failed");
-    }
-
-    function withdrawERC20(address _to, address _tokenContract, uint256 _amount) external onlyOwner {
-        require(_to != address(0), "Cant transfer to 0 address!");
-        IERC20Upgradeable tokenContract = IERC20Upgradeable(_tokenContract);
-        tokenContract.safeTransfer(_to, _amount);
     }
 
     // Admin pause
